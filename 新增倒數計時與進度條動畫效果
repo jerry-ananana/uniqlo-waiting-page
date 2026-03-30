@@ -1,0 +1,20 @@
+<!-- commit 2 -->
+JavaScript
+const totalTime = 60;
+let timeLeft = totalTime;
+
+const timerEl = document.getElementById("timer");
+const progressEl = document.getElementById("progress");
+
+setInterval(() => {
+  timeLeft--;
+
+  timerEl.textContent = timeLeft;
+
+  progressEl.style.width =
+    ((totalTime - timeLeft) / totalTime) * 100 + "%";
+
+  if (timeLeft === 0) {
+    timerEl.textContent = "☺︎ 謝謝您。歡迎再度光臨 ☺︎";
+  }
+}, 1000);
