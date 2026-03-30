@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UNIQLO 當機等候頁</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, "Noto Sans TC", sans-serif;
+      background: #f5f5f5;
+      color: #111;
+      overflow-x: hidden;
+    }
+
+    .logo {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      width: 120px;
+      z-index: 1000;
+    }
+
+    .top-banner {
+      width: min(900px, calc(100% - 180px));
+      margin: 20px auto 16px;
+      background: #ed1d24;
+      color: white;
+      text-align: center;
+      padding: 16px 20px;
+      font-size: 28px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .timer-wrap {
+      width: min(900px, calc(100% - 40px));
+      margin: 0 auto 20px;
+      text-align: center;
+    }
+
+    .timer-label {
+      font-size: 16px;
+      color: #666;
+      margin-bottom: 8px;
+    }
+
+    #timer {
+      font-size: 100px;
+      font-weight: 700;
+      color: #ed1d24;
+      margin-bottom: 14px;
+      text-align: center;
+      width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    #timer.done-text {
+      font-size: 28px !important;
+      color: #ed1d24;
+      font-weight: 700;
+      white-space: nowrap;
+      text-align: center;
+      width: 100%;
+      overflow: visible;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 14px;
+      background: #ddd;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #ed1d24, #ff6b6b);
+      transition: width 1s linear;
+    }
+
+    .message {
+      width: min(900px, calc(100% - 40px));
+      margin: 20px auto 30px;
+      background: #ed1d24;
+      color: white;
+      text-align: center;
+      padding: 14px 18px;
+      font-size: 28px;
+      font-weight: 700;
+    }
+
+    .section {
+      width: min(1100px, calc(100% - 40px));
+      margin: 0 auto 48px;
+      background: white;
+      border-radius: 18px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      padding: 24px 20px 30px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .section-title {
+      font-size: 42px;
+      font-weight: 700;
+      margin: 0 0 14px 10px;
+    }
+
+    .fitting-area {
+      position: relative;
+      width: 100%;
+      height: 620px;
+      overflow: hidden;
+      background: #fafafa;
+      border: 1px solid #eee;
+      border-radius: 18px;
+    }
+
+    .lane-label {
+      position: absolute;
+      right: 18px;
+      top: 18px;
+      background: rgba(255,255,255,0.95);
+      color: #666;
+      font-size: 14px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      z-index: 6;
+    }
+
+    .character-wrap {
+      position: absolute;
+      left: 50%;
+      top: 60px;
+      transform: translateX(-50%);
+      width: 260px;
+      height: 510px;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .character {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .item {
+      position: absolute;
+      width: 100px;
+      height: 125px;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: contain;
+      cursor: pointer;
+      z-index: 4;
+      animation-name: moveRightToLeft;
+      animation-timing-function: linear;
+      animation-fill-mode: forwards;
+      transition: transform 0.25s ease, filter 0.25s ease;
+    }
+
+    @keyframes moveRightToLeft {
+      from { left: calc(100% + 20px); }
+      to { left: -140px; }
+    }
+
+    .item.hovered {
+      animation-play-state: paused;
+      transform: scale(1.08);
+      filter: drop-shadow(0 10px 18px rgba(0,0,0,0.18));
+    }
+
+    .item.fixed {
+      animation: none !important;
+      z-index: 5;
+      filter: drop-shadow(0 10px 18px rgba(0,0,0,0.12));
+    }
+
+    .item.fixed.hovered {
+      transform: scale(1.03);
+    }
+
+    .bottom-note {
+      text-align: center;
+      margin-top: 16px;
+      color: #666;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .challenge-card {
+      width: min(1100px, calc(100% - 40px));
+      margin: 0 auto 48px;
+      background: white;
+      border-radius: 18px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      padding: 24px 20px 30px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .challenge-title {
+      font-size: 42px;
+      font-weight: 700;
+      margin: 0 0 14px 10px;
+      color: #111;
+    }
+
+    .challenge-inner {
+      background: #f2f2f2;
+      border-radius: 18px;
+      padding: 26px;
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      min-height: 240px;
+    }
+
+    .challenge-image-wrap {
+      flex: 0 0 300px;
+      max-width: 300px;
+    }
+
+    .challenge-image {
+      width: 100%;
+      display: block;
+      border-radius: 6px;
+      object-fit: contain;
+    }
+
+    .challenge-text {
+      flex: 1;
+      color: #666;
+      font-size: 24px;
+      line-height: 1.8;
+      text-align: center;
+      text-align-last: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 200px;
+    }
+
+    .challenge-text .text-block {
+      width: 100%;
+      text-align: center;
+    }
+
+    .challenge-text .highlight {
+      color: #ed1d24;
+      font-weight: 700;
+    }
+
+    .ip {
+      position: fixed;
+      width: 90px;
+      height: 90px;
+      object-fit: contain;
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0;
+      transform: scale(0.3) rotate(0deg);
+    }
+
+    .ip.show {
+      animation: fireworkPop 3s ease-in-out forwards;
+    }
+
+    @keyframes fireworkPop {
+      0% {
+        opacity: 0;
+        transform: scale(0.2) rotate(0deg);
+      }
+      20% {
+        opacity: 1;
+        transform: scale(1.08) rotate(6deg);
+      }
+      70% {
+        opacity: 1;
+        transform: scale(1) rotate(-4deg);
+      }
+      100% {
+        opacity: 0;
+        transform: scale(1.08) rotate(8deg);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .logo {
+        width: 90px;
+      }
+
+      .top-banner {
+        width: calc(100% - 30px);
+        margin-top: 90px;
+        font-size: 22px;
+      }
+
+      #timer {
+        font-size: 60px;
+      }
+
+      #timer.done-text {
+        font-size: 18px !important;
+      }
+
+      .message {
+        font-size: 22px;
+      }
+
+      .section-title,
+      .challenge-title {
+        font-size: 32px;
+      }
+
+      .fitting-area {
+        height: 520px;
+      }
+
+      .character-wrap {
+        width: 220px;
+        height: 430px;
+      }
+
+      .item {
+        width: 82px;
+        height: 105px;
+      }
+
+      .challenge-inner {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .challenge-image-wrap {
+        flex: none;
+        width: 100%;
+        max-width: 100%;
+      }
+
+      .challenge-text {
+        font-size: 18px;
+        min-height: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <img src="images/logo.png.webp" alt="UNIQLO Logo" class="logo">
+
+  <div class="top-banner">▘ 系統忙碌中，請稍等 ▗</div>
+
+  <div class="timer-wrap">
+    <div class="timer-label">預估等候時間：</div>
+    <div id="timer">60</div>
+    <div class="progress-bar">
+      <div class="progress" id="progress"></div>
+    </div>
+  </div>
+
+  <div class="message">♫ 隨意挑選 ♪ 歡迎試穿 ♫</div>
+
+  <section class="challenge-card">
+    <h2 class="challenge-title">Styling Challenge</h2>
+    <div class="challenge-inner">
+      <div class="challenge-image-wrap">
+        <img src="images/stylehint.jpg" alt="Style Hint" class="challenge-image">
+      </div>
+      <div class="challenge-text">
+        <div class="text-block">
+          衣服會從<span class="highlight">右往左</span>移動，<br>
+          用滑鼠移到衣服上會<span class="highlight">停住</span>，<br>
+          對著停住的衣服按<span class="highlight">空白鍵</span>可固定，<br>
+          再按一次解除，來一起享受穿搭自由。
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">MEN</h2>
+    <div class="fitting-area" id="men-area">
+      <div class="lane-label">右 → 左 / 滑鼠停住 + 空白鍵固定</div>
+      <div class="character-wrap">
+        <img src="images/men.png.png" alt="MEN Model" class="character">
+      </div>
+    </div>
+    <div class="bottom-note">
+      MEN：上衣與褲子從右往左移動，滑鼠停住後按空白鍵固定。
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">WOMEN</h2>
+    <div class="fitting-area" id="women-area">
+      <div class="lane-label">右 → 左 / 滑鼠停住 + 空白鍵固定</div>
+      <div class="character-wrap">
+        <img src="images/women.png.png" alt="WOMEN Model" class="character">
+      </div>
+    </div>
+    <div class="bottom-note">
+      WOMEN：上衣與褲子從右往左移動，滑鼠停住後按空白鍵固定。
+    </div>
+  </section>
+
+  <script>
+    const totalTime = 60;
+    let timeLeft = totalTime;
+    const timerEl = document.getElementById("timer");
+    const progressEl = document.getElementById("progress");
+
+    const countdown = setInterval(() => {
+      timeLeft--;
+      if (timeLeft < 0) timeLeft = 0;
+
+      progressEl.style.width = ((totalTime - timeLeft) / totalTime) * 100 + "%";
+
+      if (timeLeft === 0) {
+        clearInterval(countdown);
+        timerEl.textContent = "☺︎ 謝謝您。歡迎再度光臨 ☺︎";
+        timerEl.classList.add("done-text");
+      } else {
+        timerEl.textContent = timeLeft;
+      }
+    }, 1000);
+
+    const menTopImages = [
+      "images/topm1.png.jpg",
+      "images/topm2.png.jpg",
+      "images/topm3.png.jpg",
+      "images/topm4.png.jpg",
+      "images/topm5.png.jpg",
+      "images/topm6.png.jpg"
+    ];
+
+    const menPantsImages = [
+      "images/pantsm1.png.jpg",
+      "images/pantsm2.png.jpg",
+      "images/pantsm3.png.jpg",
+      "images/pantsm4.png.jpg",
+      "images/pantsm5.png.jpg",
+      "images/pantsm6.png.jpg"
+    ];
+
+    const womenTopImages = [
+      "images/topw1.png.jpg",
+      "images/topw2.png.jpg",
+      "images/topw3.png.jpg",
+      "images/topw4.png.jpg",
+      "images/topw5.png.jpg",
+      "images/topw6.png.jpg",
+      "images/topw7.png.jpg",
+      "images/topw8.png.jpg"
+    ];
+
+    const womenPantsImages = [
+      "images/pantsw1.png.jpg",
+      "images/pantsw2.png.jpg",
+      "images/pantsw3.png.jpg",
+      "images/pantsw4.png.jpg",
+      "images/pantsw5.png.jpg"
+    ];
+
+    let activeHoveredItem = null;
+
+    function getRandom(list) {
+      return list[Math.floor(Math.random() * list.length)];
+    }
+
+    function createMovingItem(areaId, imageList, type, rowY) {
+      const area = document.getElementById(areaId);
+      if (!area) return;
+
+      const item = document.createElement("div");
+      item.className = "item " + type;
+      item.dataset.area = areaId;
+      item.dataset.type = type;
+
+      item.style.backgroundImage = `url('${getRandom(imageList)}')`;
+      item.style.top = rowY + "px";
+
+      const duration = 5 + Math.random() * 2;
+      item.style.animationDuration = duration + "s";
+
+      item.addEventListener("mouseenter", () => {
+        activeHoveredItem = item;
+        item.classList.add("hovered");
+      });
+
+      item.addEventListener("mouseleave", () => {
+        if (activeHoveredItem === item) {
+          activeHoveredItem = null;
+        }
+        item.classList.remove("hovered");
+      });
+
+      area.appendChild(item);
+
+      setTimeout(() => {
+        if (!item.classList.contains("fixed") && item.parentNode) {
+          if (activeHoveredItem === item) {
+            activeHoveredItem = null;
+          }
+          item.remove();
+        }
+      }, (duration + 0.3) * 1000);
+    }
+
+    function toggleFix(item) {
+      const areaId = item.dataset.area;
+      const type = item.dataset.type;
+      const isFixed = item.classList.contains("fixed");
+
+      if (!isFixed) {
+        item.classList.add("fixed");
+
+        if (areaId === "men-area") {
+          if (type === "top") {
+            item.style.top = "120px";
+            item.style.left = "50%";
+            item.style.width = "150px";
+            item.style.height = "160px";
+            item.style.transform = "translateX(-50%)";
+          } else {
+            item.style.top = "290px";
+            item.style.left = "50%";
+            item.style.width = "145px";
+            item.style.height = "190px";
+            item.style.transform = "translateX(-50%)";
+          }
+        }
+
+        if (areaId === "women-area") {
+          if (type === "top") {
+            item.style.top = "125px";
+            item.style.left = "50%";
+            item.style.width = "145px";
+            item.style.height = "160px";
+            item.style.transform = "translateX(-50%)";
+          } else {
+            item.style.top = "290px";
+            item.style.left = "50%";
+            item.style.width = "140px";
+            item.style.height = "185px";
+            item.style.transform = "translateX(-50%)";
+          }
+        }
+      } else {
+        item.classList.remove("fixed");
+        item.classList.remove("hovered");
+
+        const currentTop = item.offsetTop;
+        const currentLeft = item.offsetLeft;
+
+        item.style.width = "100px";
+        item.style.height = "125px";
+        item.style.transform = "";
+        item.style.animation = "none";
+        item.style.top = currentTop + "px";
+        item.style.left = currentLeft + "px";
+
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            item.style.animation = "moveRightToLeft 2.4s linear forwards";
+          });
+        });
+
+        setTimeout(() => {
+          if (!item.classList.contains("fixed") && item.parentNode) {
+            if (activeHoveredItem === item) {
+              activeHoveredItem = null;
+            }
+            item.remove();
+          }
+        }, 2500);
+      }
+    }
+
+    document.addEventListener("keydown", (e) => {
+      if (e.code === "Space") {
+        e.preventDefault();
+        if (activeHoveredItem) {
+          toggleFix(activeHoveredItem);
+        }
+      }
+    });
+
+    setInterval(() => {
+      createMovingItem("men-area", menTopImages, "top", 120);
+    }, 1400);
+
+    setInterval(() => {
+      createMovingItem("men-area", menPantsImages, "bottom", 300);
+    }, 1700);
+
+    setInterval(() => {
+      createMovingItem("women-area", womenTopImages, "top", 120);
+    }, 1450);
+
+    setInterval(() => {
+      createMovingItem("women-area", womenPantsImages, "bottom", 300);
+    }, 1750);
+
+    const ipImages = [
+      "images/ip1.png.jpg",
+      "images/ip2.png.jpg",
+      "images/ip3.png.jpg",
+      "images/ip4.png.jpg",
+      "images/ip5.png.jpg",
+      "images/ip6.png.jpg",
+      "images/ip7.png.jpg",
+      "images/ip8.png.jpg",
+      "images/ip9.png.jpg",
+      "images/ip10.png.jpg"
+    ];
+
+    let currentIPs = [];
+
+    function clearCurrentIPs() {
+      currentIPs.forEach(ip => ip.remove());
+      currentIPs = [];
+    }
+
+    function shuffleArray(array) {
+      const newArray = [...array];
+      for (let i = newArray.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+      }
+      return newArray;
+    }
+
+    function boxesOverlap(a, b) {
+      return !(
+        a.x + a.w < b.x ||
+        b.x + b.w < a.x ||
+        a.y + a.h < b.y ||
+        b.y + b.h < a.y
+      );
+    }
+
+    function getSafeNonOverlapPositions(count) {
+      const positions = [];
+      const maxTry = 200;
+
+      for (let i = 0; i < count; i++) {
+        let placed = false;
+        let tryCount = 0;
+
+        while (!placed && tryCount < maxTry) {
+          const size = 70 + Math.random() * 60;
+          const useLeft = Math.random() < 0.5;
+
+          const sidePadding = 20;
+          const topPadding = 120;
+          const bottomPadding = 40;
+
+          const leftZoneWidth = Math.min(180, window.innerWidth * 0.16);
+          const rightZoneWidth = Math.min(180, window.innerWidth * 0.16);
+
+          let x;
+          if (useLeft) {
+            x = sidePadding + Math.random() * Math.max(20, leftZoneWidth - size - sidePadding);
+          } else {
+            const zoneStart = window.innerWidth - rightZoneWidth;
+            x = zoneStart + Math.random() * Math.max(20, rightZoneWidth - size - sidePadding);
+          }
+
+          const availableHeight = window.innerHeight - topPadding - bottomPadding - size;
+          const y = topPadding + Math.random() * Math.max(20, availableHeight);
+
+          const newBox = { x, y, w: size, h: size };
+
+          let overlap = false;
+          for (const oldBox of positions) {
+            if (boxesOverlap(newBox, oldBox)) {
+              overlap = true;
+              break;
+            }
+          }
+
+          if (!overlap) {
+            positions.push(newBox);
+            placed = true;
+          }
+
+          tryCount++;
+        }
+
+        if (!placed) {
+          positions.push({
+            x: 20 + i * 10,
+            y: 140 + i * 100,
+            w: 80,
+            h: 80
+          });
+        }
+      }
+
+      return positions;
+    }
+
+    function showRandomIPs() {
+      clearCurrentIPs();
+
+      const selectedIPs = shuffleArray(ipImages).slice(0, 3);
+      const positions = getSafeNonOverlapPositions(3);
+
+      selectedIPs.forEach((src, index) => {
+        const img = document.createElement("img");
+        img.src = src;
+        img.className = "ip show";
+
+        img.style.width = positions[index].w + "px";
+        img.style.height = positions[index].h + "px";
+        img.style.left = positions[index].x + "px";
+        img.style.top = positions[index].y + "px";
+
+        document.body.appendChild(img);
+        currentIPs.push(img);
+      });
+    }
+
+    showRandomIPs();
+    setInterval(showRandomIPs, 3000);
+  </script>
+</body>
+</html>
