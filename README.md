@@ -1,0 +1,1 @@
+# uniqlo-waiting-page
