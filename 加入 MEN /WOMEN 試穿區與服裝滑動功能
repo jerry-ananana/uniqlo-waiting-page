@@ -1,0 +1,30 @@
+<!-- commit 3 -->
+HTML
+<section>
+  <h2>MEN</h2>
+  <div id="men-area">
+    <img src="images/men.png.png">
+  </div>
+</section>
+
+CSS
+.item {
+  position: absolute;
+  animation: moveRightToLeft linear forwards;
+}
+
+@keyframes moveRightToLeft {
+  from { left: 100%; }
+  to { left: -120px; }
+}
+
+JavaScript
+function createMovingItem(areaId, imageList) {
+  const item = document.createElement("div");
+
+  item.className = "item";
+  item.style.backgroundImage =
+    `url('${imageList[Math.floor(Math.random()*imageList.length)]}')`;
+
+  document.getElementById(areaId).appendChild(item);
+}
