@@ -1,0 +1,52 @@
+<!-- commit 5 -->
+
+💻 程式碼（JS）
+const ipList = [
+  "images/ip1.png.jpg",
+  "images/ip2.png.jpg",
+  "images/ip3.png.jpg",
+  "images/ip4.png.jpg",
+  "images/ip5.png.jpg",
+  "images/ip6.png.jpg",
+  "images/ip7.png.jpg",
+  "images/ip8.png.jpg",
+  "images/ip9.png.jpg",
+  "images/ip10.png.jpg"
+];
+🎲 隨機抽 3 張（不重複）
+function getRandomIPs() {
+  const shuffled = [...ipList].sort(() => 0.5 - Math.random());
+  return shuffled.slice(0, 3);
+}
+📍 左右側 + 不重疊
+function getPosition(side, index) {
+  const y = 150 + index * 150;
+
+  if (side === "left") {
+    return { x: 50, y };
+  } else {
+    return { x: window.innerWidth - 150, y };
+  }
+}
+🎬 顯示
+function showIPs() {
+  document.querySelectorAll(".ip-dynamic").forEach(el => el.remove());
+
+  const selected = getRandomIPs();
+
+  selected.forEach((src, i) => {
+    const img = document.createElement("img");
+    img.src = src;
+    img.className = "ip-dynamic";
+
+    const side = i % 2 === 0 ? "left" : "right";
+    const pos = getPosition(side, i);
+
+    img.style.left = pos.x + "px";
+    img.style.top = pos.y + "px";
+
+    document.body.appendChild(img);
+  });
+}
+
+setInterval(showIPs, 3000);
