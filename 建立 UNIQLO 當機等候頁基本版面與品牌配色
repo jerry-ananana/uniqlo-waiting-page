@@ -1,0 +1,22 @@
+<!-- commit 1 -->
+HTML
+<img src="images/logo.png.webp" class="logo">
+
+<div class="top-banner">
+  ▘ 系統忙碌中，請稍等 ▗
+</div>
+
+<div class="message">
+  ♫ 隨意挑選 ♪ 歡迎試穿 ♫
+</div>
+
+CSS
+<img src="images/logo.png.webp" class="logo">
+
+<div class="top-banner">
+  ▘ 系統忙碌中，請稍等 ▗
+</div>
+
+<div class="message">
+  ♫ 隨意挑選 ♪ 歡迎試穿 ♫
+</div>
