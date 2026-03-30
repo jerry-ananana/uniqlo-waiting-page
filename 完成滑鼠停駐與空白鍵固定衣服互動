@@ -1,0 +1,20 @@
+<!-- commit 4 -->
+💻 程式碼（JS）
+let activeHoveredItem = null;
+
+item.addEventListener("mouseenter", () => {
+  activeHoveredItem = item;
+  item.style.animationPlayState = "paused";
+});
+
+item.addEventListener("mouseleave", () => {
+  activeHoveredItem = null;
+  item.style.animationPlayState = "running";
+});
+document.addEventListener("keydown", (e) => {
+  if (e.code === "Space") {
+    if (activeHoveredItem) {
+      activeHoveredItem.classList.toggle("fixed");
+    }
+  }
+});
